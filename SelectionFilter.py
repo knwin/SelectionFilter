@@ -59,19 +59,30 @@ class SelectionFilter:
       
     def filterSelected(self, layer:None):
         #if layer==None:
-        field = "FID"
+        field = "VT_PCODE"
         layer = self.iface.activeLayer()            
         selection = layer.selectedFeatures()
         if len(selection):
-            if field in layer.fields():
-                ids = [feature[field] for feature in selection ]
-                query_syntax = f"{field} IN {tuple(ids)}"
+            fields = layer.fields()
+            #fields = [f for f in fields]
+            fields = [f.name() for f in fields]
+            if field in fields:
+                unique_values = [feature[field] for feature in selection ]
+                if len(unique_values) > 1:
+                    query_syntax = f"{field} IN {tuple(unique_values)}"
+                else:
+                    query_syntax = f"{field} IN ({unique_values[0]})"
+                    
                 layer.setSubsetString(query_syntax)
-            else:
-                QgsMessageLog.logMessage("FID field does not exists","Messages",level=Qgis.Warning)
+                
+                iface.messageBar().pushMessage(f"{len(unique_values)} feature(s) filtered", level=Qgis.Info)
+            else:               
+                iface.messageBar().pushMessage(f"{field} field does not exists",level=Qgis.Warning)
+
         else:
             #print ("Nothing is selected")
-            QgsMessageLog.logMessage("Nothing is selected!","Messages",level=Qgis.Info)
+            #QgsMessageLog.logMessage("Nothing is selected!","Messages",level=Qgis.Info)
+            iface.messageBar().pushMessage("Nothing is selected!",level=Qgis.Warning)
 
             
     def clearFilterSelected(self, layer:None):

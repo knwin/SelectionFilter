@@ -59,8 +59,15 @@ class SelectionFilter:
       
     def filterSelected(self, layer:None):
         #if layer==None:
-        field = "VT_PCODE"
-        layer = self.iface.activeLayer()            
+        #field = "VT_PCODE"
+        layer = self.iface.activeLayer() 
+        field = layer.customProperty("unique_field", "")
+        if not field:
+            #field = "FID"
+            #layer.setCustomProperty("unique_field", field)
+            iface.messageBar().pushMessage("in console run... \nlayer=iface.activeLayer() \nlayer.setCustomProperty(\"unique_field\", \"field\")\n\nwhere field is actual field name with unique values.")
+            return None
+            
         selection = layer.selectedFeatures()
         if len(selection):
             fields = layer.fields()

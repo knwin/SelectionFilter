@@ -38,7 +38,7 @@ class SelectionFilter:
         self.create_clear_filter_action = QAction(
             QIcon(os.path.join(os.path.dirname(__file__), "icons/sf_clear_icon.svg")), QCoreApplication.translate("clearFilterSelected", "&Clear filter"))
         self.set_unique_field_action = QAction(
-            QIcon(os.path.join(os.path.dirname(__file__), "icons/sf_icon.svg")), QCoreApplication.translate("showSetUniqueFieldPopup", "Set &unique field"))
+            QIcon(os.path.join(os.path.dirname(__file__), "icons/sf_field_icon.svg")), QCoreApplication.translate("showSetUniqueFieldPopup", "Se&t field"))
 
     def initGui(self):    
         QgsProject.instance().layerWasAdded.connect(self.updateFilterActions)

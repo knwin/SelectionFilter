@@ -11,3 +11,5 @@ Menus can be found in the layer's right click popup as follow
  - **Show selected features only** - set filter for selected features
  - **Clear filter** - remove the filter
  - **Set field** - to choose a field to use in the filter
+
+(images\plugin.jpg)

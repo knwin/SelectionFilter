@@ -27,30 +27,30 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.utils import iface
 import os
-
+from .setUniqueField import setUniqueFieldPopup
 class SelectionFilter:
     def __init__(self, iface):
         super().__init__()
         self.iface = iface
+
         self.create_filter_action = QAction(
             QIcon(os.path.join(os.path.dirname(__file__), "icons/sf_icon.svg")), QCoreApplication.translate("filterSelected", "&Show selected feature only"))
         self.create_clear_filter_action = QAction(
             QIcon(os.path.join(os.path.dirname(__file__), "icons/sf_clear_icon.svg")), QCoreApplication.translate("clearFilterSelected", "&Clear filter"))
-        '''self.create_filter_action = QAction(
-            QgsApplication.getThemeIcon("/mActionAddTable.svg"), QCoreApplication.translate("filterSelected", "&Show selected feature only"))
-        self.create_clear_filter_action = QAction(
-            QgsApplication.getThemeIcon("/mActionAddTable.svg"), QCoreApplication.translate("clearFilterSelected", "&Clear filter"))'''
-
+        self.set_unique_field_action = QAction(
+            QIcon(os.path.join(os.path.dirname(__file__), "icons/sf_icon.svg")), QCoreApplication.translate("showSetUniqueFieldPopup", "Set &unique field"))
 
     def initGui(self):    
         QgsProject.instance().layerWasAdded.connect(self.updateFilterActions)
 
         for layer in list(QgsProject.instance().mapLayers().values()):
             self.updateFilterActions(layer)
-            
+  
         self.create_filter_action.triggered.connect(self.filterSelected)
         self.create_clear_filter_action.triggered.connect(self.clearFilterSelected)
-    
+        self.set_unique_field_action.triggered.connect(self.showSetUniqueFieldPopup)
+
+        
     def unload(self):
 
         self.iface.removeCustomActionForLayerType(self.create_filter_action)
@@ -65,7 +65,7 @@ class SelectionFilter:
         if not field:
             #field = "FID"
             #layer.setCustomProperty("unique_field", field)
-            iface.messageBar().pushMessage("in console run... \nlayer=iface.activeLayer() \nlayer.setCustomProperty(\"unique_field\", \"field\")\n\nwhere field is actual field name with unique values.")
+            iface.messageBar().pushMessage("You need to set unique value field first, type in console as follow.. \nlayer=iface.activeLayer() \nlayer.setCustomProperty(\"unique_field\", \"field\")\n\nwhere field is actual field name with unique values.",level=Qgis.Warning)
             return None
             
         selection = layer.selectedFeatures()
@@ -103,7 +103,23 @@ class SelectionFilter:
         self.iface.removeCustomActionForLayerType(self.create_clear_filter_action)
         self.iface.addCustomActionForLayerType(self.create_clear_filter_action,
                                                None, QgsMapLayerType.VectorLayer, allLayers=False)
+        self.iface.removeCustomActionForLayerType(self.set_unique_field_action)
+        self.iface.addCustomActionForLayerType(self.set_unique_field_action,
+                                               None, QgsMapLayerType.VectorLayer, allLayers=False)
         for layer in QgsProject.instance().mapLayers().values():
             if layer and layer.type() == QgsMapLayerType.VectorLayer:
                 self.iface.addCustomActionForLayer(self.create_filter_action, layer)
                 self.iface.addCustomActionForLayer(self.create_clear_filter_action, layer)
+                self.iface.addCustomActionForLayer(self.set_unique_field_action, layer)
+                
+    def showSetUniqueFieldPopup(self,layer:None):
+        self.popup = setUniqueFieldPopup()
+        layer = self.iface.activeLayer()
+        fieldNames = [field.name() for field in layer.fields()]
+        self.popup.comboBoxFields.addItems(fieldNames) 
+        self.popup.show()
+        
+        ok = self.popup.exec_()
+        if ok:
+            field = self.popup.comboBoxFields.currentText()
+            layer.setCustomProperty("unique_field", field)

@@ -12,4 +12,14 @@ Menus can be found in the layer's right click popup as follow
  - **Clear filter** - remove the filter
  - **Set field** - to choose a field to use in the filter
 
-(images\plugin.jpg)
+![plugin](images\plugin.jpg)
+
+![Menus](images\menus.jpg)
+
+![select and filter](images\select_and_filter.jpg)
+
+![select a field](images\select_a_field.jpg)
+
+![result](images\result.jpg)
+
+![remove filter](images\remove_filter.jpg)

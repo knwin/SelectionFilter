@@ -1,4 +1,4 @@
-# SelectionFilter
+# Selection as Filter QGIS Plugin
  You know what you want to show from the layer visually and it is tedious work to write a query syntax for too many features.
 
  This plugin will allow you to select features and then make a filter on the layer to show just selected features.

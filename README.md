@@ -3,7 +3,7 @@
 
  This plugin will allow you to select features and then make a filter on the layer to show just selected features.
  
- It use a user selected field to use in the filter. If the field is with unique values, the exact selected features will be shown. If the field has duplicated values, then the result will include features that you do not selected.
+ It uses a user selected field to use in the filter. If the field is with unique values, the exact selected features will be shown. If the field has duplicated values, then the result will include features that you do not selected.
 
  You can reset the field anytime.
 

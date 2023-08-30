@@ -58,27 +58,26 @@ class SelectionFilter:
 
       
     def filterSelected(self, layer:None):
-        #if layer==None:
-        #field = "VT_PCODE"
+
         layer = self.iface.activeLayer() 
-        field = layer.customProperty("unique_field", "")
+        field = layer.customProperty("unique_field", "") #stored unique field for this layer        
         if not field:
-            #field = "FID"
-            #layer.setCustomProperty("unique_field", field)
-            iface.messageBar().pushMessage("You need to set unique value field first, type in console as follow.. \nlayer=iface.activeLayer() \nlayer.setCustomProperty(\"unique_field\", \"field\")\n\nwhere field is actual field name with unique values.",level=Qgis.Warning)
-            return None
+            field = self.showSetUniqueFieldPopup(layer)
             
         selection = layer.selectedFeatures()
+        
         if len(selection):
-            fields = layer.fields()
-            #fields = [f for f in fields]
-            fields = [f.name() for f in fields]
+            fields = {f.name():f.type() for f in layer.fields()}
             if field in fields:
                 unique_values = [feature[field] for feature in selection ]
                 if len(unique_values) > 1:
                     query_syntax = f"{field} IN {tuple(unique_values)}"
                 else:
                     query_syntax = f"{field} IN ({unique_values[0]})"
+                    # make sure string value is written as string
+                    if fields.get(field) == 10:
+                        query_syntax = f"{field} IN (\'{unique_values[0]}\')"
+                    
                     
                 layer.setSubsetString(query_syntax)
                 
@@ -87,8 +86,6 @@ class SelectionFilter:
                 iface.messageBar().pushMessage(f"{field} field does not exists",level=Qgis.Warning)
 
         else:
-            #print ("Nothing is selected")
-            #QgsMessageLog.logMessage("Nothing is selected!","Messages",level=Qgis.Info)
             iface.messageBar().pushMessage("Nothing is selected!",level=Qgis.Warning)
 
             
@@ -123,3 +120,5 @@ class SelectionFilter:
         if ok:
             field = self.popup.comboBoxFields.currentText()
             layer.setCustomProperty("unique_field", field)
+            iface.messageBar().pushMessage(f"{field} is set as unique field for {layer.name()} layer", level=Qgis.Info)
+            return field

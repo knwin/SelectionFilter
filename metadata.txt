@@ -30,7 +30,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=http://homepage
+homepage=https://github.com/knwin/SelectionFilter/blob/main/README.md
 category=Vector
 icon=icon.png
 # experimental flag

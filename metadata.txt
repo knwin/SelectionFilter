@@ -12,13 +12,13 @@ email=kyawnaingwinknw@gmail.com
 
 about=This plugin will show only selected feature using filter query. Menus are in the layer's right click popup menus. The field selected and  its values for the selected features are used in query syntax. If you want just selected features to show, set a field with unique values. If the field has duplicate values (e.g parent or higher admin level), some features which are not selected will be shown.
 
-MENUs:
-Show selected features only - set filter for selected features
-Clear filter - remove the filter
-Set field - to choose a field to use in the filter
+  MENUs:
+  Show selected features only - set filter for selected features
+  Clear filter - remove the filter
+  Set field - to choose a field to use in the filter
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/knwin/SelectionFilter/issues
+repository=https://github.com/knwin/SelectionFilter
 # End of mandatory metadata
 
 # Recommended items:

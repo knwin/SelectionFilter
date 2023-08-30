@@ -14,12 +14,12 @@ Menus can be found in the layer's right click popup as follow
 
 ![plugin](images/plugin.jpg)
 
-![Menus](images\menus.jpg)
+![Menus](images/menus.jpg)
 
-![select and filter](images\select_and_filter.jpg)
+![select and filter](images/select_and_filter.jpg)
 
-![select a field](images\select_a_field.jpg)
+![select a field](images/select_a_field.jpg)
 
-![result](images\result.jpg)
+![result](images/result.jpg)
 
-![remove filter](images\remove_filter.jpg)
+![remove filter](images/remove_filter.jpg)

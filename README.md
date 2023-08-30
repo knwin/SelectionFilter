@@ -15,24 +15,31 @@ Menus can be found in the layer's right click popup as follow
 ![plugin](images/plugin.jpg)
 
 menus are in the layer's right click popup
+
 ![Menus](images/menus.jpg)
 
 with selection tool(s) or any selection methods, select your features and the click "Show selected features only" menu.
+
 ![select and filter](images/select_and_filter.jpg)
 
 At first time, you will be asked to choose a field with which query will be constructed.
+
 ![select a field](images/select_a_field.jpg)
 
 Voila!
+
 ![result](images/results.jpg)
 
 You can remove the filter
+
 ![remove filter](images/remove_filter.jpg)
 
 Depend on the field you choose, result will be different.
 
 When a unique id field is selected.
+
 ![remove filter](images/unique_field_results.jpg)
 
 When a parent admin field is selected
-![remove filter](images/nonunique_field_results.jpg)
+
+![remove filter](images/nonunique_field_results.png)

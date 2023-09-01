@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Choose a unique field for this layer</string>
+   <string>Set a field for filtering</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">

@@ -113,8 +113,16 @@ class SelectionFilter:
         self.popup = setUniqueFieldPopup()
         layer = self.iface.activeLayer()
         fieldNames = [field.name() for field in layer.fields()]
-        self.popup.comboBoxFields.addItems(fieldNames) 
-        self.popup.show()
+        self.popup.comboBoxFields.addItems(fieldNames)
+        
+        field = layer.customProperty("unique_field", "") #stored unique field for this layer        
+        if field:
+            #field = self.showSetUniqueFieldPopup(layer)
+            self.popup.comboBoxFields.setCurrentText(field) 
+        try:
+            self.popup.show()
+        except:
+            pass
         
         ok = self.popup.exec_()
         if ok:

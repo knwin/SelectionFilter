@@ -5,12 +5,12 @@
 [general]
 name=Selection as Filter
 qgisMinimumVersion=3.16
-description=This plugin make filter for the selected features
+description=This plugin makes filter for the selected features
 version=1.0
 author=Kyaw Naing Win
 email=kyawnaingwinknw@gmail.com
 
-about=This plugin will show only selected feature using filter query. Menus are in the layer's right click popup menus. The field selected and  its values for the selected features are used in query syntax. If you want just selected features to show, set a field with unique values. If the field has duplicate values (e.g parent or higher admin level), some features which are not selected will be shown.
+about=This plugin will show only the selected feature using filter query. Menus are in the layer's right click popup menus. The field selected and  its values for the selected features are used in query syntax. If you want to show only selected features, set a field with unique values. If the field has duplicate values (e.g parent field), some other features which are not selected will be in the filtered result.
 
   MENUs:
   Show selected features only - set filter for selected features

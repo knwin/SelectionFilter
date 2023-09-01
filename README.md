@@ -34,12 +34,12 @@ You can remove the filter
 
 ![remove filter](images/remove_filter.jpg)
 
-Depend on the field you choose, result will be different.
+## Depend on the field you choose, result will be different.
 
-When a unique id field is selected.
+When a unique id field is set to use, eaxct features being selected are filtered.
 
 ![remove filter](images/unique_field_results.jpg)
 
-When a parent admin field is selected
+When a parent admin field is set to use in the fiter, all the childern of the parent are filtered.
 
 ![remove filter](images/nonunique_field_results.png)

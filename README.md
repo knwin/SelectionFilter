@@ -12,7 +12,7 @@ Menus can be found in the layer's right click popup as follow
  - **Clear filter** - remove the filter
  - **Set field** - to choose a field to use in the filter
 
-*Note: this plugin do not use ![spatial query](https://github.com/WhereGroup/spatial_filter) like in use normal query syntax so that it works on any vector layers.*
+*Note: this plugin do not use spatial query likw in ![Spatial Filter](https://github.com/WhereGroup/spatial_filter) but use normal query syntax so that it works on any vector layers*
 
 ![plugin](images/plugin.jpg)
 

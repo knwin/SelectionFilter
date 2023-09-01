@@ -62,7 +62,8 @@ class SelectionFilter:
         layer = self.iface.activeLayer() 
         field = layer.customProperty("unique_field", "") #stored unique field for this layer        
         if not field:
-            field = self.showSetUniqueFieldPopup(layer)
+            self.showSetUniqueFieldPopup(layer)
+            field = layer.customProperty("unique_field", "")
             
         selection = layer.selectedFeatures()
         
@@ -129,4 +130,4 @@ class SelectionFilter:
             field = self.popup.comboBoxFields.currentText()
             layer.setCustomProperty("unique_field", field)
             iface.messageBar().pushMessage(f"{field} is set for {layer.name()} layer filtering", level=Qgis.Info)
-            return field
+            #return field

@@ -1,5 +1,5 @@
 # Selection as Filter QGIS Plugin
- You know what you want to show from the layer visually and it is tedious work to write a query syntax for too many features.
+ You know what you want to show from the layer visually and it is tedious work to write a query syntax manully for too many features that you can select by mouse.
 
  This plugin will allow you to select features and then make a filter on the layer to show just selected features.
  
@@ -11,6 +11,8 @@ Menus can be found in the layer's right click popup as follow
  - **Show selected features only** - set filter for selected features
  - **Clear filter** - remove the filter
  - **Set field** - to choose a field to use in the filter
+
+*Note: this plugin do not use ![spatial query](https://github.com/WhereGroup/spatial_filter) like in use normal query syntax so that it works on any vector layers.*
 
 ![plugin](images/plugin.jpg)
 

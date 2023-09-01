@@ -128,5 +128,5 @@ class SelectionFilter:
         if ok:
             field = self.popup.comboBoxFields.currentText()
             layer.setCustomProperty("unique_field", field)
-            iface.messageBar().pushMessage(f"{field} is set as unique field for {layer.name()} layer", level=Qgis.Info)
+            iface.messageBar().pushMessage(f"{field} is set for {layer.name()} layer filtering", level=Qgis.Info)
             return field

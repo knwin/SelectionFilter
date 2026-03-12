@@ -1,4 +1,6 @@
 # Selection as Filter QGIS Plugin
+version 2.0
+
  You know what you want to show from the layer visually and it is tedious work to write a query syntax manully for too many features that you can select by mouse.
 
  This plugin will allow you to select features and then make a filter on the layer to show just selected features.

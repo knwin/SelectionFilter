@@ -5,7 +5,6 @@
 [general]
 name=Selection as Filter
 qgisMinimumVersion=3.16
-qgisMaximumVersion=4.99
 description=This plugin makes filter for the selected features
 version=2.0
 author=Kyaw Naing Win
@@ -15,7 +14,6 @@ about=This plugin will show only the selected feature using filter query. Menus 
 
   MENUs:
   Show selected features only - set filter for selected features
-  Hide selected features - set filter to hide selected features
   Clear filter - remove the filter
   Set field - to choose a field to use in the filter
 
@@ -27,18 +25,8 @@ repository=https://github.com/knwin/SelectionFilter
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=
-  Date: 2026-03-12
-  change log ver2: 
-   - Compatible with both QGIS 3.x and QGIS 4.x versions
-   - Hide filter added
-        
-  change log ver1:
-   - Compatible only with QGIS 3.x
-   - Show selected features
-   - Clear filter
-   - Set field
-   
+# changelog=
+
 # Tags are comma separated with spaces allowed
 tags=python
 
@@ -61,3 +49,5 @@ Category of the plugin: Raster, Vector, Database or Web
 
 # If the plugin can run on QGIS Server.
 server=False
+
+supportsQt6=True

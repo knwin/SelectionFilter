@@ -9,10 +9,11 @@
 
 Menus can be found in the layer's right click popup as follow
  - **Show selected features only** - set filter for selected features
+ - **Hide selected features ** - set filter to hide selected features
  - **Clear filter** - remove the filter
  - **Set field** - to choose a field to use in the filter
 
-*Note: this plugin do not use spatial query likw in ![Spatial Filter](https://github.com/WhereGroup/spatial_filter) but use normal query syntax so that it works on any vector layers*
+*Note: this plugin does not use spatial query like in ![Spatial Filter](https://github.com/WhereGroup/spatial_filter) but use normal query syntax so that it works on any vector layers*
 
 ![plugin](images/plugin.jpg)
 

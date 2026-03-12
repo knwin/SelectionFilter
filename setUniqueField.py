@@ -1,10 +1,5 @@
 import os
 
-<<<<<<< HEAD
-#from PyQt5 import uic
-#from PyQt5 import QtWidgets
-=======
->>>>>>> b271a74e3be63ab981f547f9d64cea7ffdcfef94
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 

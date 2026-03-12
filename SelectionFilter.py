@@ -89,7 +89,7 @@ class SelectionFilter:
                 self.iface.removeCustomActionForLayer(self.create_filter_action, layer)
             except Exception:
                 pass
-                        try:
+            try:
                 self.iface.removeCustomActionForLayer(self.create_hide_filter_action, layer)
             except Exception:
                 pass

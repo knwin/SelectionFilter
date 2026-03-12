@@ -1,7 +1,12 @@
 import os
 
-from PyQt5 import uic
-from PyQt5 import QtWidgets
+<<<<<<< HEAD
+#from PyQt5 import uic
+#from PyQt5 import QtWidgets
+=======
+>>>>>>> b271a74e3be63ab981f547f9d64cea7ffdcfef94
+from qgis.PyQt import uic
+from qgis.PyQt import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(

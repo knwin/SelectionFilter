@@ -61,11 +61,10 @@ class SelectionFilter:
         except Exception:
             pass
 
-<<<<<<< HEAD
         self.iface.removeCustomActionForLayerType(self.create_filter_action)
         self.iface.removeCustomActionForLayerType(self.create_hide_filter_action)
         self.iface.removeCustomActionForLayerType(self.create_clear_filter_action)
-=======
+
         # 2) Disconnect QAction signals so slots won't be called after plugin unload
         try:
             self.create_filter_action.triggered.disconnect(self.filterSelected)
@@ -117,7 +116,6 @@ class SelectionFilter:
                 self.popup.deleteLater()
         except Exception:
             pass
->>>>>>> b271a74e3be63ab981f547f9d64cea7ffdcfef94
 
       
     def filterSelected(self, layer:None):
@@ -133,13 +131,9 @@ class SelectionFilter:
         if len(selection):
             fields = {f.name():f.type() for f in layer.fields()}
             if field in fields:
-<<<<<<< HEAD
-                unique_values = [feature[field] for feature in selection ]
-                unique_values = list(set(unique_values))
-=======
                 values = [feature[field] for feature in selection ]
                 unique_values = list(set(values))
->>>>>>> b271a74e3be63ab981f547f9d64cea7ffdcfef94
+
                 if len(unique_values) > 1:
                     query_syntax = f"{field} IN {tuple(unique_values)}"
                 else:

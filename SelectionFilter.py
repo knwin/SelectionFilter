@@ -71,6 +71,10 @@ class SelectionFilter:
         except Exception:
             pass
         try:
+            self.create_hide_filter_action.triggered.disconnect(self.hideSelected)
+        except Exception:
+            pass
+        try:
             self.create_clear_filter_action.triggered.disconnect(self.clearFilterSelected)
         except Exception:
             pass
@@ -85,6 +89,10 @@ class SelectionFilter:
                 self.iface.removeCustomActionForLayer(self.create_filter_action, layer)
             except Exception:
                 pass
+                        try:
+                self.iface.removeCustomActionForLayer(self.create_hide_filter_action, layer)
+            except Exception:
+                pass
             try:
                 self.iface.removeCustomActionForLayer(self.create_clear_filter_action, layer)
             except Exception:
@@ -97,6 +105,10 @@ class SelectionFilter:
         # 4) Remove the actions registered for layer types (global registration)
         try:
             self.iface.removeCustomActionForLayerType(self.create_filter_action)
+        except Exception:
+            pass
+        try:
+            self.iface.removeCustomActionForLayerType(self.create_hide_filter_action)
         except Exception:
             pass
         try:

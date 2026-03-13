@@ -130,6 +130,16 @@ class SelectionFilter:
             pass
 
       
+    def _format_query(self, field, field_type, values, operator):
+        if len(values) > 1:
+            return f"{field} {operator} {tuple(values)}"
+        if field_type == 10:
+            return f"{field} {operator} ('{values[0]}')"
+        return f"{field} {operator} ({values[0]})"
+
+    def _build_query(self, field, field_type, unique_values):
+        return self._format_query(field, field_type, unique_values, "IN")
+
     def _applySelectionFilter(self, show_selected):
         layer = self.iface.activeLayer()
         field = layer.customProperty("unique_field", "")
@@ -137,14 +147,15 @@ class SelectionFilter:
             self.showSetUniqueFieldPopup(layer)
             field = layer.customProperty("unique_field", "")
 
+        original_count = layer.selectedFeatureCount()
+        if not original_count:
+            iface.messageBar().pushMessage("Nothing is selected!", level=Qgis.Warning)
+            return
+
         if not show_selected:
             layer.invertSelection()
 
         selection = layer.selectedFeatures()
-
-        if not len(selection):
-            iface.messageBar().pushMessage("Nothing is selected!", level=Qgis.Warning)
-            return
 
         fields = {f.name(): f.type() for f in layer.fields()}
         if field not in fields:
@@ -152,15 +163,7 @@ class SelectionFilter:
             return
 
         unique_values = list(set(feature[field] for feature in selection))
-
-        if len(unique_values) > 1:
-            query_syntax = f"{field} IN {tuple(unique_values)}"
-        else:
-            query_syntax = f"{field} IN ({unique_values[0]})"
-            # make sure string value is written as string
-            if fields.get(field) == 10:
-                query_syntax = f"{field} IN (\'{unique_values[0]}\')"
-
+        query_syntax = self._build_query(field, fields[field], unique_values)
         layer.setSubsetString(query_syntax)
 
         if show_selected:
@@ -169,7 +172,7 @@ class SelectionFilter:
             value_plural_text = "value" if len(unique_values) == 1 else "values"
             iface.messageBar().pushMessage(f"{len(unique_values)} unique {value_plural_text} and {feature_count} {feature_plural_text} filtered", level=Qgis.Info)
         else:
-            iface.messageBar().pushMessage(f"{len(unique_values)} feature(s) filtered", level=Qgis.Info)
+            iface.messageBar().pushMessage(f"{original_count} feature(s) hidden", level=Qgis.Info)
 
     def filterSelected(self, layer:None):
         self._applySelectionFilter(show_selected=True)

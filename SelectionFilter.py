@@ -137,8 +137,32 @@ class SelectionFilter:
             return f"{field} {operator} ('{values[0]}')"
         return f"{field} {operator} ({values[0]})"
 
-    def _build_query(self, field, field_type, unique_values):
-        return self._format_query(field, field_type, unique_values, "IN")
+    def _build_query(self, layer, field, field_type, show_selected):
+        selected_unique = list(set(f[field] for f in layer.selectedFeatures()))
+        not_selected_count = layer.featureCount() - len(selected_unique)
+        prior_subset = layer.subsetString()
+
+        if show_selected:
+            # IN (selected) is always correct.
+            # NOT IN (inverted) is shorter when inverted side is smaller, safe only with no prior subset.
+            if not prior_subset and not_selected_count < len(selected_unique):
+                layer.invertSelection()
+                inverted_unique = list(set(f[field] for f in layer.selectedFeatures()))
+                layer.invertSelection()  # restore original selection
+                return self._format_query(field, field_type, inverted_unique, "NOT IN")
+            return self._format_query(field, field_type, selected_unique, "IN")
+        else:
+            # NOT IN (selected) composed with the prior subset is always correct and
+            # shorter when the selected side is smaller than the inverted side.
+            if len(selected_unique) <= not_selected_count:
+                not_in_query = self._format_query(field, field_type, selected_unique, "NOT IN")
+                if prior_subset:
+                    return f"{prior_subset}\nAND {not_in_query}"
+                return not_in_query
+            # Inverted side is shorter: use IN (inverted within current subset).
+            layer.invertSelection()
+            inverted_unique = list(set(f[field] for f in layer.selectedFeatures()))
+            return self._format_query(field, field_type, inverted_unique, "IN")
 
     def _applySelectionFilter(self, show_selected):
         layer = self.iface.activeLayer()
@@ -152,25 +176,19 @@ class SelectionFilter:
             iface.messageBar().pushMessage("Nothing is selected!", level=Qgis.Warning)
             return
 
-        if not show_selected:
-            layer.invertSelection()
-
-        selection = layer.selectedFeatures()
-
         fields = {f.name(): f.type() for f in layer.fields()}
         if field not in fields:
             iface.messageBar().pushMessage(f"{field} field does not exists", level=Qgis.Warning)
             return
 
-        unique_values = list(set(feature[field] for feature in selection))
-        query_syntax = self._build_query(field, fields[field], unique_values)
+        field_type = fields[field]
+        query_syntax = self._build_query(layer, field, field_type, show_selected)
         layer.setSubsetString(query_syntax)
 
         if show_selected:
             feature_count = layer.featureCount()
             feature_plural_text = "feature" if feature_count == 1 else "features"
-            value_plural_text = "value" if len(unique_values) == 1 else "values"
-            iface.messageBar().pushMessage(f"{len(unique_values)} unique {value_plural_text} and {feature_count} {feature_plural_text} filtered", level=Qgis.Info)
+            iface.messageBar().pushMessage(f"{feature_count} {feature_plural_text} filtered", level=Qgis.Info)
         else:
             iface.messageBar().pushMessage(f"{original_count} feature(s) hidden", level=Qgis.Info)
 

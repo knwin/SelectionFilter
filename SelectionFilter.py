@@ -142,32 +142,34 @@ class SelectionFilter:
             return f"{field} {operator} ('{values[0]}')"
         return f"{field} {operator} ({values[0]})"
 
+    def _shorter_query(self, field, field_type, in_values, not_in_values):
+        """Return IN (in_values) or NOT IN (not_in_values), whichever list is shorter."""
+        if not_in_values and len(not_in_values) < len(in_values):
+            return self._format_query(field, field_type, not_in_values, "NOT IN")
+        return self._format_query(field, field_type, in_values, "IN")
+
     def _build_query(self, layer, field, field_type, show_selected):
         selected_unique = list(set(f[field] for f in layer.selectedFeatures()))
-        not_selected_count = layer.featureCount() - len(selected_unique)
         prior_subset = layer.subsetString()
 
+        layer.invertSelection()
+        inverted_unique = list(set(f[field] for f in layer.selectedFeatures()))
+        layer.invertSelection()  # restore original selection
+
         if show_selected:
-            # IN (selected) is always correct.
-            # NOT IN (inverted) is shorter when inverted side is smaller, safe only with no prior subset.
-            if not prior_subset and not_selected_count < len(selected_unique):
-                layer.invertSelection()
-                inverted_unique = list(set(f[field] for f in layer.selectedFeatures()))
-                layer.invertSelection()  # restore original selection
-                return self._format_query(field, field_type, inverted_unique, "NOT IN")
+            # IN (selected) always replaces the prior filter cleanly — no AND needed.
+            # NOT IN (inverted) is only safe when there is no prior subset, because
+            # NOT IN on the full layer could expose features outside the prior view.
+            if not prior_subset:
+                return self._shorter_query(field, field_type, selected_unique, inverted_unique)
             return self._format_query(field, field_type, selected_unique, "IN")
         else:
-            # NOT IN (selected) composed with the prior subset is always correct and
-            # shorter when the selected side is smaller than the inverted side.
-            if len(selected_unique) <= not_selected_count:
-                not_in_query = self._format_query(field, field_type, selected_unique, "NOT IN")
-                if prior_subset:
-                    return f"{prior_subset}\nAND {not_in_query}"
-                return not_in_query
-            # Inverted side is shorter: use IN (inverted within current subset).
-            layer.invertSelection()
-            inverted_unique = list(set(f[field] for f in layer.selectedFeatures()))
-            return self._format_query(field, field_type, inverted_unique, "IN")
+            # For hide, NOT IN (selected) is short but must be scoped.
+            # Compose with prior_subset via AND when NOT IN is chosen.
+            query = self._shorter_query(field, field_type, inverted_unique, selected_unique)
+            if "NOT IN" in query and prior_subset:
+                return f"({prior_subset}) AND {query}"
+            return query
 
     def _applySelectionFilter(self, show_selected):
         layer = self.iface.activeLayer()

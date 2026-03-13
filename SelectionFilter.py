@@ -142,32 +142,34 @@ class SelectionFilter:
 
         selection = layer.selectedFeatures()
 
-        if len(selection):
-            fields = {f.name(): f.type() for f in layer.fields()}
-            if field in fields:
-                unique_values = list(set(feature[field] for feature in selection))
-
-                if len(unique_values) > 1:
-                    query_syntax = f"{field} IN {tuple(unique_values)}"
-                else:
-                    query_syntax = f"{field} IN ({unique_values[0]})"
-                    # make sure string value is written as string
-                    if fields.get(field) == 10:
-                        query_syntax = f"{field} IN (\'{unique_values[0]}\')"
-
-                layer.setSubsetString(query_syntax)
-
-                if show_selected:
-                    feature_count = layer.featureCount()
-                    feature_plural_text = "feature" if feature_count == 1 else "features"
-                    value_plural_text = "value" if len(unique_values) == 1 else "values"
-                    iface.messageBar().pushMessage(f"{len(unique_values)} unique {value_plural_text} and {feature_count} {feature_plural_text} filtered", level=Qgis.Info)
-                else:
-                    iface.messageBar().pushMessage(f"{len(unique_values)} feature(s) filtered", level=Qgis.Info)
-            else:
-                iface.messageBar().pushMessage(f"{field} field does not exists", level=Qgis.Warning)
-        else:
+        if not len(selection):
             iface.messageBar().pushMessage("Nothing is selected!", level=Qgis.Warning)
+            return
+
+        fields = {f.name(): f.type() for f in layer.fields()}
+        if field not in fields:
+            iface.messageBar().pushMessage(f"{field} field does not exists", level=Qgis.Warning)
+            return
+
+        unique_values = list(set(feature[field] for feature in selection))
+
+        if len(unique_values) > 1:
+            query_syntax = f"{field} IN {tuple(unique_values)}"
+        else:
+            query_syntax = f"{field} IN ({unique_values[0]})"
+            # make sure string value is written as string
+            if fields.get(field) == 10:
+                query_syntax = f"{field} IN (\'{unique_values[0]}\')"
+
+        layer.setSubsetString(query_syntax)
+
+        if show_selected:
+            feature_count = layer.featureCount()
+            feature_plural_text = "feature" if feature_count == 1 else "features"
+            value_plural_text = "value" if len(unique_values) == 1 else "values"
+            iface.messageBar().pushMessage(f"{len(unique_values)} unique {value_plural_text} and {feature_count} {feature_plural_text} filtered", level=Qgis.Info)
+        else:
+            iface.messageBar().pushMessage(f"{len(unique_values)} feature(s) filtered", level=Qgis.Info)
 
     def filterSelected(self, layer:None):
         self._applySelectionFilter(show_selected=True)

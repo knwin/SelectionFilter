@@ -21,13 +21,18 @@
  ***************************************************************************/
  """
 
-from qgis.core import (QgsApplication, QgsMapLayerType, QgsProject, QgsMessageLog, Qgis)
-#from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtGui import QIcon, QAction
-from qgis.PyQt.QtCore import QCoreApplication
-from qgis.utils import iface
 import os
+
+from qgis.core import Qgis, QgsMapLayerType, QgsProject
+from qgis.PyQt.QtCore import QCoreApplication
+
+#from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtGui import QAction, QIcon
+from qgis.utils import iface
+
 from .setUniqueField import setUniqueFieldPopup
+
+
 class SelectionFilter:
     def __init__(self, iface):
         super().__init__()

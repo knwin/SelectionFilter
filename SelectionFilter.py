@@ -168,7 +168,7 @@ class SelectionFilter:
             # Compose with prior_subset via AND when NOT IN is chosen.
             query = self._shorter_query(field, field_type, inverted_unique, selected_unique)
             if "NOT IN" in query and prior_subset:
-                return f"({prior_subset}) AND {query}"
+                return f"{prior_subset}\nAND {query}"
             return query
 
     def _applySelectionFilter(self, show_selected):

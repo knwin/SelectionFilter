@@ -21,13 +21,18 @@
  ***************************************************************************/
  """
 
-from qgis.core import (QgsApplication, QgsMapLayerType, QgsProject, QgsMessageLog, Qgis)
-#from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtGui import QIcon, QAction
-from qgis.PyQt.QtCore import QCoreApplication
-from qgis.utils import iface
 import os
+
+from qgis.core import Qgis, QgsMapLayerType, QgsProject
+from qgis.PyQt.QtCore import QCoreApplication
+
+#from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtGui import QAction, QIcon
+from qgis.utils import iface
+
 from .setUniqueField import setUniqueFieldPopup
+
+
 class SelectionFilter:
     def __init__(self, iface):
         super().__init__()
@@ -130,73 +135,75 @@ class SelectionFilter:
             pass
 
       
-    def filterSelected(self, layer:None):
+    def _format_query(self, field, field_type, values, operator):
+        if len(values) > 1:
+            return f"{field} {operator} {tuple(values)}"
+        if field_type == 10:
+            return f"{field} {operator} ('{values[0]}')"
+        return f"{field} {operator} ({values[0]})"
 
-        layer = self.iface.activeLayer() 
-        field = layer.customProperty("unique_field", "") #stored unique field for this layer        
-        if not field:
-            self.showSetUniqueFieldPopup(layer)
-            field = layer.customProperty("unique_field", "")
-            
-        selection = layer.selectedFeatures()
-        
-        if len(selection):
-            fields = {f.name():f.type() for f in layer.fields()}
-            if field in fields:
-                values = [feature[field] for feature in selection ]
-                unique_values = list(set(values))
+    def _shorter_query(self, field, field_type, in_values, not_in_values):
+        """Return IN (in_values) or NOT IN (not_in_values), whichever list is shorter."""
+        if not_in_values and len(not_in_values) < len(in_values):
+            return self._format_query(field, field_type, not_in_values, "NOT IN")
+        return self._format_query(field, field_type, in_values, "IN")
 
-                if len(unique_values) > 1:
-                    query_syntax = f"{field} IN {tuple(unique_values)}"
-                else:
-                    query_syntax = f"{field} IN ({unique_values[0]})"
-                    # make sure string value is written as string
-                    if fields.get(field) == 10:
-                        query_syntax = f"{field} IN (\'{unique_values[0]}\')"
-                    
-                    
-                layer.setSubsetString(query_syntax)
-                
-                feature_count = layer.featureCount()
-                feature_plural_text = "feature" if feature_count == 1 else "features"
-                value_plural_text = "value" if len(unique_values) == 1 else "values"
-                iface.messageBar().pushMessage(f"{len(unique_values)} unique {value_plural_text} and {feature_count} {feature_plural_text} filtered", level=Qgis.Info)
-            else:               
-                iface.messageBar().pushMessage(f"{field} field does not exists",level=Qgis.Warning)
+    def _build_query(self, layer, field, field_type, show_selected):
+        selected_unique = list(set(f[field] for f in layer.selectedFeatures()))
+        prior_subset = layer.subsetString()
 
+        layer.invertSelection()
+        inverted_unique = list(set(f[field] for f in layer.selectedFeatures()))
+        layer.invertSelection()  # restore original selection
+
+        if show_selected:
+            # IN (selected) always replaces the prior filter cleanly — no AND needed.
+            # NOT IN (inverted) is only safe when there is no prior subset, because
+            # NOT IN on the full layer could expose features outside the prior view.
+            if not prior_subset:
+                return self._shorter_query(field, field_type, selected_unique, inverted_unique)
+            return self._format_query(field, field_type, selected_unique, "IN")
         else:
-            iface.messageBar().pushMessage("Nothing is selected!",level=Qgis.Warning)
+            # For hide, NOT IN (selected) is short but must be scoped.
+            # Compose with prior_subset via AND when NOT IN is chosen.
+            query = self._shorter_query(field, field_type, inverted_unique, selected_unique)
+            if "NOT IN" in query and prior_subset:
+                return f"{prior_subset}\nAND {query}"
+            return query
 
-    def hideSelected(self, layer:None):
-        layer = self.iface.activeLayer() 
+    def _applySelectionFilter(self, show_selected):
+        layer = self.iface.activeLayer()
         field = layer.customProperty("unique_field", "")
         if not field:
             self.showSetUniqueFieldPopup(layer)
             field = layer.customProperty("unique_field", "")
-        layer.invertSelection()    
-        selection = layer.selectedFeatures()
-        
-        if len(selection):
-            fields = {f.name():f.type() for f in layer.fields()}            
-            if field in fields:
-                unique_values = [feature[field] for feature in selection ]
-                unique_values = list(set(unique_values))
-                if len(unique_values) > 1:
-                    query_syntax = f"{field} IN {tuple(unique_values)}"
-                else:
-                    query_syntax = f"{field} IN ({unique_values[0]})"
-                    # make sure string value is written as string
-                    if fields.get(field) == 10:
-                        query_syntax = f"{field} IN (\'{unique_values[0]}\')"
-                                    
-                layer.setSubsetString(query_syntax)
-                
-                iface.messageBar().pushMessage(f"{len(unique_values)} feature(s) filtered", level=Qgis.Info)
-            else:               
-                iface.messageBar().pushMessage(f"{field} field does not exists",level=Qgis.Warning)
 
+        original_count = layer.selectedFeatureCount()
+        if not original_count:
+            iface.messageBar().pushMessage("Nothing is selected!", level=Qgis.Warning)
+            return
+
+        fields = {f.name(): f.type() for f in layer.fields()}
+        if field not in fields:
+            iface.messageBar().pushMessage(f"{field} field does not exists", level=Qgis.Warning)
+            return
+
+        field_type = fields[field]
+        query_syntax = self._build_query(layer, field, field_type, show_selected)
+        layer.setSubsetString(query_syntax)
+
+        if show_selected:
+            feature_count = layer.featureCount()
+            feature_plural_text = "feature" if feature_count == 1 else "features"
+            iface.messageBar().pushMessage(f"{feature_count} {feature_plural_text} filtered", level=Qgis.Info)
         else:
-            iface.messageBar().pushMessage("Nothing is selected!",level=Qgis.Warning)
+            iface.messageBar().pushMessage(f"{original_count} feature(s) hidden", level=Qgis.Info)
+
+    def filterSelected(self, layer:None):
+        self._applySelectionFilter(show_selected=True)
+
+    def hideSelected(self, layer:None):
+        self._applySelectionFilter(show_selected=False)
             
     def clearFilterSelected(self, layer:None):
         layer = self.iface.activeLayer()
@@ -234,7 +241,7 @@ class SelectionFilter:
             self.popup.comboBoxFields.setCurrentText(field) 
         try:
             self.popup.show()
-        except:
+        except Exception:
             pass
         
         ok = self.popup.exec()

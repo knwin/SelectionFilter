@@ -136,6 +136,8 @@ class SelectionFilter:
 
       
     def _format_query(self, field, field_type, values, operator):
+        if not values:
+            return "1 = 1" if operator == "NOT IN" else "1 = 0"
         if len(values) > 1:
             return f"{field} {operator} {tuple(values)}"
         if field_type == 10:

@@ -27,7 +27,10 @@ from qgis.core import Qgis, QgsMapLayerType, QgsProject
 from qgis.PyQt.QtCore import QCoreApplication
 
 #from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtGui import QAction, QIcon
+#from qgis.PyQt.QtGui import QAction, QIcon
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
+
 from qgis.utils import iface
 
 from .setUniqueField import setUniqueFieldPopup
